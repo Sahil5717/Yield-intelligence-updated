@@ -1,0 +1,14 @@
+# Yield Intelligence — optional heavy dependencies
+#
+# These power /api/mmm (Bayesian MMM via PyMC NUTS) and /api/forecast
+# (Prophet primary, ARIMA fallback). They require a C compiler and
+# BLAS headers at install time. In Docker this means installing
+# build-essential + libblas-dev before pip install.
+#
+# Not included in the Railway deploy to keep the image small and
+# builds fast. Install locally with:
+#   pip install -r requirements.txt -r requirements-heavy.txt
+
+pymc>=5.10,<6.0
+arviz>=0.17,<1.0
+prophet>=1.1,<2.0

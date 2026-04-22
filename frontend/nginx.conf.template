@@ -1,0 +1,43 @@
+# Nginx config for the Yield Intelligence frontend SPA.
+#
+# $PORT is substituted by nginx's envsubst at container start (via
+# /etc/nginx/templates/ mechanism in the official nginx image).
+
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Security: basic hardening headers
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Gzip for text assets
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript
+               text/xml application/xml application/xml+rss text/javascript
+               application/wasm;
+    gzip_min_length 1024;
+
+    # Aggressive caching for hashed assets (Vite emits hashed filenames)
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # SPA fallback — any unknown path serves index.html so React Router
+    # can handle it. Without this, /opportunities reloads would 404.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Never cache index.html itself — it references hashed bundles which
+    # would otherwise get stuck.
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        expires 0;
+    }
+}

@@ -1,0 +1,23 @@
+# Railway config for the Yield Intelligence frontend.
+#
+# Deploy from the frontend/ directory:
+#   railway link              (from frontend/ dir, pick your service)
+#   railway variables set VITE_API_BASE_URL=https://<your-backend>.up.railway.app
+#   railway up
+#
+# The VITE_API_BASE_URL is a *build-time* variable — the bundle has to
+# be rebuilt whenever the backend URL changes. Railway passes service
+# variables into the Docker build as build args automatically when
+# they're named the same as the ARG in the Dockerfile.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[build.args]
+VITE_API_BASE_URL = "${{VITE_API_BASE_URL}}"
+
+[deploy]
+startCommand = "nginx -g 'daemon off;'"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

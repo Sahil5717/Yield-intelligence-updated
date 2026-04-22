@@ -1,0 +1,34 @@
+# Yield Intelligence — core runtime dependencies
+#
+# This is the slim install used for Railway deploy. It excludes the
+# heavy Bayesian/forecasting stack (pymc, arviz, prophet) which pulls
+# in pytensor + C compilation + BLAS headers and roughly triples the
+# image size and build time.
+#
+# The two endpoints that depend on them (/api/mmm, /api/forecast)
+# lazy-import inside the function and will return a helpful error if
+# hit without the heavy stack installed. Every other endpoint works
+# with this slim install.
+#
+# To install the heavy stack for local dev / MMM runs:
+#   pip install -r requirements.txt -r requirements-heavy.txt
+
+# --- Core numerical stack ---
+numpy>=1.26,<3.0
+pandas>=2.1,<4.0
+scipy>=1.11,<2.0
+scikit-learn>=1.4,<2.0
+statsmodels>=0.14,<1.0
+
+# --- Web framework ---
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29,<1.0
+python-multipart>=0.0.9,<1.0
+
+# --- File handling ---
+openpyxl>=3.1,<4.0
+
+# --- Auth (JWT + password hashing) ---
+python-jose[cryptography]>=3.3,<4.0
+passlib[bcrypt]>=1.7,<2.0
+bcrypt==4.0.1                  # passlib 1.7.x is incompatible with bcrypt 4.1+
